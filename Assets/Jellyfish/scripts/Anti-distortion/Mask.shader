@@ -117,7 +117,7 @@ Shader "Custom/Mask"
                 else
                 {
                     float linearDepth;
-                    linearDepth = tex2D(_CameraDepthTexture, flippedUVs);
+                    linearDepth = 1 - tex2D(_MainTex, i.uv).a;
                     // linearDepth = Linear01Depth(linearDepth*255) + 0.5f;
                     
                     return fixed4(linearDepth,linearDepth,linearDepth,linearDepth);
