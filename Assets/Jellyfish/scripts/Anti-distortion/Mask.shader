@@ -72,24 +72,6 @@ Shader "Custom/Mask"
 
             v2f vert (appdata v)
             {
-                // v2f o;
-                // float4 worldPosition = mul(unity_ObjectToWorld, v.vertex);
-                
-                // float4 viewPosition = mul(_TargetCameraViewMatrix, worldPosition);
-                
-                // o.vertex = mul(_TargetCameraProjMatrix, viewPosition);
-                
-                // o.vertex =  mul(unity_ObjectToWorld, v.vertex);
-                
-                // float4 worldPosition = mul(unity_ObjectToWorld, v.vertex);
-                // float4 viewPosition = mul(UNITY_MATRIX_MV, worldPosition);
-                // o.vertex = mul(UNITY_MATRIX_P, viewPosition);
-
-                
-                // o.uv = TRANSFORM_TEX(v.uv, _MainTex);
-                // return o;
-
-                //
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
@@ -99,20 +81,16 @@ Shader "Custom/Mask"
             fixed4 frag (v2f i) : SV_Target
             {
                 float2 flippedUVs = i.uv;
-                flippedUVs.y = i.uv.y - _EyeOffsetY/_ScreenSize ;
-                flippedUVs.x = _EyeOffsetX/_ScreenSize - i.uv.x;
+                // flippedUVs.y = i.uv.y - _EyeOffsetY/_ScreenSize ;
+                // flippedUVs.x = _EyeOffsetX/_ScreenSize - i.uv.x;
                 
                 if(_Thick > 0)
                 {
                     float c;
-                    c = tex2D(thicknessBuffer, flippedUVs).r;
-                    // c = 1-c*_Bright;
-
-                    // float linearDepth;
-                    // linearDepth = tex2D(depthBuffer, flippedUVs);
-                    // linearDepth = Linear01Depth(linearDepth*255) + 0.5f;
-                    // c+=linearDepth;
-                    return fixed4(c, c, c, 1);
+                    c = tex2D(_MainTex, flippedUVs).r + tex2D(_MainTex, flippedUVs).b + tex2D(_MainTex, flippedUVs).g;
+                    if(c>0) c = c;
+                    else c=1;
+                    return fixed4(c, c, c, c);
                 }
                 else
                 {
