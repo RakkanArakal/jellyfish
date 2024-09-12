@@ -47,8 +47,7 @@ Shader "Custom/Mask"
             {
                 float2 uv : TEXCOORD0;
                 float4 vertex : SV_POSITION;
-                float4 shadowCoord : TEXCOORD1;
-
+                float3 viewVec : TEXCOORD01;
             };
 
             sampler2D _MainTex;
@@ -58,11 +57,8 @@ Shader "Custom/Mask"
             sampler2D thicknessBuffer;
             sampler2D _GlobalTransparencyTexture;
             sampler2D _CurveTex;
-            sampler2D _ShadowMap;
-            sampler2D _ShadowMapTexture;
 
-            // UNITY_DECLARE_SHADOWMAP(_ShadowMapTexture);
-            // float4 _ShadowMapTexture_TexelSize;
+            UNITY_DECLARE_SHADOWMAP(_ShadowMapTexture);
             
             float _Thick;
             float _Depth;
@@ -86,11 +82,12 @@ Shader "Custom/Mask"
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
-                
-                float4 worldPosition = mul(unity_ObjectToWorld, v.vertex);
-                float4 shadowCoord = mul(unity_WorldToShadow[0], worldPosition);
 
-                o.shadowCoord = shadowCoord;
+                float3 ndcPos = float3(o.uv.xy * 2.0 - 1.0, 1);
+				float far = _ProjectionParams.z;
+				float3 clipVec = float3(ndcPos.x, ndcPos.y, ndcPos.z * -1) * far;
+				o.viewVec = mul(unity_CameraInvProjection, clipVec.xyzz).xyz;
+
                 return o;
             }
             
@@ -101,7 +98,9 @@ Shader "Custom/Mask"
                 // flippedUVs.x = _EyeOffsetX/_ScreenSize - i.uv.x;
 
                 float thick = tex2D(thicknessBuffer, flippedUVs).r * _Bright;
-                float depth = 1-Linear01Depth(tex2D(depthBuffer, i.uv)*255);
+                float depth = Linear01Depth(SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture,i.uv));
+                float3 viewPos = i.viewVec * depth;
+				float3 worldPos = mul(unity_CameraToWorld, float4(viewPos,1)).xyz;
 
                 float color = tex2D(_MainTex, flippedUVs).r + tex2D(_MainTex, flippedUVs).b + tex2D(_MainTex, flippedUVs).g;
                 float alpha = tex2D(_MainTex, flippedUVs).a;
@@ -110,7 +109,10 @@ Shader "Custom/Mask"
                 float transparency = tex2D(_CurveTex, float2(tex2D(_GlobalTransparencyTexture, i.uv).r, 0)).r;
 
                 // float shadow = 0;
-                fixed shadow = tex2Dproj(_ShadowMapTexture, i.shadowCoord).r;
+                float4 shadowCoord = mul(unity_WorldToShadow[0], float4(worldPos, 1));
+                float shadow = UNITY_SAMPLE_SHADOW(_ShadowMapTexture, shadowCoord);
+                // float shadow = tex2Dproj(_ShadowMapTexture, shadowCoord).r;
+                if (depth > 0.99) shadow = 1;
                 
                 // float shadow = tex2D(_ShadowMap,flippedUVs);
                 // float shadow = tex2D(_ShadowMapTexture,flippedUVs);
@@ -121,7 +123,6 @@ Shader "Custom/Mask"
                                     + transparency * _Transparency + shadow * _Shadow;;
                 // mix = 1-mix;
                 return fixed4(mix, mix, mix, 1);
-
             }
             
             
