@@ -6,11 +6,11 @@ Shader "Custom/Mask"
 {
     Properties
     {
-        _Thick("ThicknessBuffer weights", float) = 0
-        _Depth("DepthBuffer weights", float) = 0
-        _Bright("Brightness", float) = 0
-        _Color("ColorBuffer weights", float) = 0
-        _Alpha("AlphaBuffer weights", float) = 0
+//        _Thick("ThicknessBuffer weights", float) = 0
+//        _Depth("DepthBuffer weights", float) = 0
+//        _Bright("Brightness", float) = 0
+//        _Color("ColorBuffer weights", float) = 0
+//        _Alpha("AlphaBuffer weights", float) = 0
         _MainTex ("Texture", 2D) = "white" {}
         
         _ScreenSize("Screen Size", float) = 1.0
@@ -33,7 +33,10 @@ Shader "Custom/Mask"
 
             #include "UnityCG.cginc"
             #include "Func.cginc"
-
+            // #pragma multi_compile_fog
+            // #pragma multi_compile_fwdbase
+            // #pragma shader_feature 
+            
             struct appdata
             {
                 float4 vertex : POSITION;
@@ -44,6 +47,8 @@ Shader "Custom/Mask"
             {
                 float2 uv : TEXCOORD0;
                 float4 vertex : SV_POSITION;
+                float4 shadowCoord : TEXCOORD1;
+
             };
 
             sampler2D _MainTex;
@@ -51,14 +56,22 @@ Shader "Custom/Mask"
             sampler2D colorBuffer;
             sampler2D depthBuffer;
             sampler2D thicknessBuffer;
-            sampler2D _CameraDepthNormalsTexture;
+            sampler2D _GlobalTransparencyTexture;
+            sampler2D _CurveTex;
+            sampler2D _ShadowMap;
+            sampler2D _ShadowMapTexture;
 
+            // UNITY_DECLARE_SHADOWMAP(_ShadowMapTexture);
+            // float4 _ShadowMapTexture_TexelSize;
+            
             float _Thick;
             float _Depth;
             float _Bright;
             float _Color;
             float _Alpha;
-
+            float _Shadow;
+            float _Transparency;
+            
             float4 _MainTex_ST;
             float2 _MainTex_TexelSize;
             float _ScreenSize;
@@ -66,15 +79,21 @@ Shader "Custom/Mask"
             float _EyeOffsetY;
             float _ScreenOffsetX;
             float _ScreenOffsetY;
+            
 
             v2f vert (appdata v)
             {
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
+                
+                float4 worldPosition = mul(unity_ObjectToWorld, v.vertex);
+                float4 shadowCoord = mul(unity_WorldToShadow[0], worldPosition);
+
+                o.shadowCoord = shadowCoord;
                 return o;
             }
-
+            
             fixed4 frag (v2f i) : SV_Target
             {
                 float2 flippedUVs = i.uv;
@@ -84,16 +103,28 @@ Shader "Custom/Mask"
                 float thick = tex2D(thicknessBuffer, flippedUVs).r * _Bright;
                 float depth = 1-Linear01Depth(tex2D(depthBuffer, i.uv)*255);
 
-                // float color = tex2D(_MainTex, flippedUVs).r + tex2D(_MainTex, flippedUVs).b + tex2D(_MainTex, flippedUVs).g;
-                float color = tex2D(_MainTex, flippedUVs).r;
-                // if(color>0) color=1;
+                float color = tex2D(_MainTex, flippedUVs).r + tex2D(_MainTex, flippedUVs).b + tex2D(_MainTex, flippedUVs).g;
                 float alpha = tex2D(_MainTex, flippedUVs).a;
 
-                float mix = thick * _Thick + depth * _Depth + color * _Color + alpha * _Alpha;
-                mix = 1-mix;
+                // float transparency = 1-tex2D(_CurveTex, float2(tex2D(_GlobalTransparencyTexture, i.uv).r, 0)).r;
+                float transparency = tex2D(_CurveTex, float2(tex2D(_GlobalTransparencyTexture, i.uv).r, 0)).r;
+
+                // float shadow = 0;
+                fixed shadow = tex2Dproj(_ShadowMapTexture, i.shadowCoord).r;
+                
+                // float shadow = tex2D(_ShadowMap,flippedUVs);
+                // float shadow = tex2D(_ShadowMapTexture,flippedUVs);
+                // if(alpha>0.9 && color<0.1) shadow = 1;
+                // if(alpha>0.9 && color<0.1) shadow = 1;
+
+                float mix = thick * _Thick + depth * _Depth + color * _Color + alpha * _Alpha
+                                    + transparency * _Transparency + shadow * _Shadow;;
+                // mix = 1-mix;
                 return fixed4(mix, mix, mix, 1);
 
             }
+            
+            
             ENDCG
         }
     }

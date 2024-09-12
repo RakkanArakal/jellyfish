@@ -364,19 +364,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400276, guid: 412b92d4feeb9c548bfa98f62c4d1022, type: 3}
       propertyPath: m_LocalRotation.w
-      value: .0608067475
+      value: 0.060806748
       objectReference: {fileID: 0}
     - target: {fileID: 400276, guid: 412b92d4feeb9c548bfa98f62c4d1022, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -.0937465429
+      value: -0.09374654
       objectReference: {fileID: 0}
     - target: {fileID: 400276, guid: 412b92d4feeb9c548bfa98f62c4d1022, type: 3}
       propertyPath: m_LocalRotation.y
-      value: .697855175
+      value: 0.6978552
       objectReference: {fileID: 0}
     - target: {fileID: 400276, guid: 412b92d4feeb9c548bfa98f62c4d1022, type: 3}
       propertyPath: m_LocalRotation.z
-      value: .707469046
+      value: 0.70746905
       objectReference: {fileID: 0}
     - target: {fileID: 9500000, guid: 412b92d4feeb9c548bfa98f62c4d1022, type: 3}
       propertyPath: m_Controller
@@ -474,7 +474,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: b93d437afd480234288c9b9fd63b9383, type: 2}
+  - {fileID: 2100000, guid: a48964b9973341f4ba0ce832c3ad39e3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -552,7 +552,6 @@ GameObject:
   - component: {fileID: 1368474002}
   - component: {fileID: 1368474001}
   - component: {fileID: 1368474000}
-  - component: {fileID: 1368473999}
   - component: {fileID: 1368473998}
   - component: {fileID: 1368473997}
   m_Layer: 0
@@ -576,11 +575,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maskPass: {fileID: 2100000, guid: 8bffaedb82b6e8e4791549a805298802, type: 2}
   eyeOffset: {x: 0, y: 0}
-  thick: 1
+  thick: 0
   depth: 0
   bright: 0.4
-  alpha: 0.5
-  color: 1
+  alpha: 0
+  color: 0
+  transparency: 0
+  shadow: 1
 --- !u!114 &1368473998
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -596,14 +597,6 @@ MonoBehaviour:
   focus: {x: 0, y: 0.8, z: 0}
   focusObj: {fileID: 726439579}
   showInstWindow: 1
---- !u!81 &1368473999
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1368473996}
-  m_Enabled: 1
 --- !u!124 &1368474000
 Behaviour:
   m_ObjectHideFlags: 0
