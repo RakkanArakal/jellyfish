@@ -13,6 +13,7 @@ public class UnityChanController : MonoBehaviour
 
     void Start()
     {
+
         mySequence = DOTween.Sequence();
         
         mySequence.Append(transform.DOMove(new Vector3(0,0,0), duration)
@@ -21,6 +22,8 @@ public class UnityChanController : MonoBehaviour
             .SetEase(Ease.InOutQuad));
         mySequence.Append(transform.DORotate(new Vector3(0,0,0),0.5f)
                 .SetEase(Ease.InOutQuad));
+        
+
         
     }
 

@@ -62,17 +62,17 @@ Material:
     m_Ints: []
     m_Floats:
     - _Alpha: 0
-    - _Bright: 0.4
+    - _Bright: 0
     - _BumpScale: 1
-    - _Color: 0
+    - _Color: 1
     - _Cutoff: 0.5
     - _D: 1000
     - _Depth: 0
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
     - _EyeOffset: 0
-    - _EyeOffsetX: 0
-    - _EyeOffsetY: 0
+    - _EyeOffsetX: 2560
+    - _EyeOffsetY: 200
     - _F_A: 1
     - _F_B: 1
     - _F_G: 1

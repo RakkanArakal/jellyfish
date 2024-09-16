@@ -77,8 +77,8 @@ Material:
     - _F_B: 1
     - _F_G: 1
     - _F_R: 1
-    - _GlossMapScale: 1
-    - _Glossiness: 0.5
+    - _GlossMapScale: 0.878
+    - _Glossiness: 1
     - _GlossyReflections: 1
     - _Height: 25
     - _Mask: 1
@@ -97,7 +97,7 @@ Material:
     - _Width: 25
     - _ZWrite: 1
     m_Colors:
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0, g: 0, b: 0, a: 0}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _EyeOffset: {r: 0, g: 0, b: 0, a: 0}
     - _K_B: {r: -0.0003, g: -0.0101, b: 1.0281, a: 1}

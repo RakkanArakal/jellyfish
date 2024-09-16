@@ -1,28 +1,15 @@
 // Made with Amplify Shader Editor
 // Available at the Unity Asset Store - http://u3d.as/y3X 
-Shader "Jellyfish_skin"
+Shader "transparent_plane"
 {
 	Properties
 	{
 		_AlbedoTex("Albedo Tex", 2D) = "white" {}
 		_AlbedoColorFilter("Albedo Color Filter", Color) = (0.2688679,0.3390668,1,1)
-		_SmoothnessValue("Smoothness Value", Range( 0 , 1)) = 0
-		_MetallicValue("Metallic Value", Range( 0 , 1)) = 0
 		_OpacityTex("Opacity Tex", 2D) = "black" {}
 		_OpacityValue("Opacity Value", Range( 0 , 1)) = 1
 		_OpacityFresnel("Opacity Fresnel", Range( 0 , 1.5)) = 1.5
-		_EmissionTex("Emission Tex", 2D) = "black" {}
-		_EmissionColorFilter("Emission Color Filter", Color) = (0,0.7923045,1,0)
-		_EmissionValue("Emission Value", Range( 0 , 1)) = 1
-		_EmissionFresnel("Emission Fresnel", Range( 0 , 1)) = 0.5
 		_TranslucencyColorFilter("Translucency Color Filter", Color) = (0.7234038,0.08399999,1,0)
-		[Header(Translucency)]
-		_Translucency("Strength", Range( 0 , 50)) = 1
-		_TransNormalDistortion("Normal Distortion", Range( 0 , 1)) = 0.1
-		_TransScattering("Scaterring Falloff", Range( 1 , 50)) = 2
-		_TransDirect("Direct", Range( 0 , 1)) = 1
-		_TransAmbient("Ambient", Range( 0 , 1)) = 0.2
-		_TransShadow("Shadow", Range( 0 , 1)) = 0.9
 		[HideInInspector] _texcoord( "", 2D ) = "white" {}
 		[HideInInspector] __dirty( "", Int ) = 1
 	}
@@ -132,7 +119,9 @@ Shader "Jellyfish_skin"
 			float4 blendOpSrc26 = tex2D( _OpacityTex, uv_OpacityTex );
 			float4 blendOpDest26 = temp_cast_3;
 
-			o.Alpha = ( saturate( 	max( blendOpSrc26, blendOpDest26 ) )).r;
+			// o.Alpha = ( saturate( 	max( blendOpSrc26, blendOpDest26 ) )).r;
+
+			o.Alpha = _OpacityValue;
 		}
 
 		ENDCG
@@ -206,7 +195,10 @@ Shader "Jellyfish_skin"
 				#if defined( CAN_SKIP_VPOS )
 				float2 vpos = IN.pos;
 				#endif
-				half alphaRef = tex3D( _DitherMaskLOD, float3( vpos.xy * 0.25, o.Alpha * 0.9375 ) ).a;
+				// half alphaRef = tex3D( _DitherMaskLOD, float3( vpos.xy * 0.25, o.Alpha * 0.9375 ) ).a;
+				// half alphaRef = tex3D( _DitherMaskLOD, float3( vpos.xy * 0.25, o.Alpha * 0.01 ) ).a;
+				half alphaRef = o.Alpha;
+
 				clip( alphaRef - 0.01 );
 				SHADOW_CASTER_FRAGMENT( IN )
 			}
